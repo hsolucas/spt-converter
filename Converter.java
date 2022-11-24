@@ -11,7 +11,7 @@ public class Converter {
     
     static List<String> SHAPE_LINES;
     static List<String> BILH_LINES;
-    static String BILH_FILE_PATH = "files/sptrans-gtfs/09-Setembro-2022.csv";
+    static String BILH_FILE_PATH = "files/bilhetagem/09-Setembro-2022.csv";
     static String OUTPUT_FILE_PATH = "files/output/v4.geojson";
     static int MAX_READS = Integer.MAX_VALUE;
 
