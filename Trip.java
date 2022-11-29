@@ -12,6 +12,15 @@ public class Trip {
     private Bilhetagem bilhetagem;
     private List<Shape> shapes;
 
+    public Trip(String cod, String codSent, String name){
+        
+        this.cod = cod;
+        this.codSent = codSent;
+        this.name = name;
+        this.days = "";
+        
+    }
+
     public Trip(String line){
 
         String[] spl = line.split(",");

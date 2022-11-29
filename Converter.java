@@ -3,6 +3,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,42 +14,68 @@ public class Converter {
     static List<String> SHAPE_LINES;
     static List<String> BILH_LINES;
     static String BILH_FILE_PATH = "files/bilhetagem/09-Setembro-2022.csv";
-    static String OUTPUT_FILE_PATH = "files/output/v4.geojson";
-    static int MAX_READS = Integer.MAX_VALUE;
+    static String OUTPUT_FILE_PATH = "files/output/new_geofile.json";
+    static int MAX_READS = Integer.MAX_VALUE; //Limitar regs para testes
 
     public static void main(String...args){
 
-        Map<String, Trip> trips = readAllTrips(MAX_READS);
+        Map<String, Trip> trips = readAllTrips();
         Map<String, DadosMapa> dadosMapa = readDadosMapa();
         Map<String, Route> routes = readRoutes();
 
+        dadosMapa.keySet().forEach(k -> System.out.println(k));
+
+        //Check recent inactivated lines
+        dadosMapa.keySet().stream()
+        .filter(k -> k != null && trips.get(k) == null)
+        .forEach(k -> {
+            System.out.println("Trips NOT found. Line will be deactivated " + k);
+            DadosMapa dm = dadosMapa.get(k);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            dm.setDATA_DESATIVAC(String.valueOf(cal.get(Calendar.YEAR)));
+            Trip t = new Trip(
+                dm.getLINHA_COD(),
+                dm.getLINHA_SENT(),
+                dm.getLINHA_NOME()
+            );
+            t.setDadosMapa(dm);
+            t.setBilhetagem(new Bilhetagem());
+            trips.put(k, t);
+        });
+
+        
         trips.keySet().stream()
         .forEach(k -> {
             Trip t = trips.get(k);
+            System.out.println("Preparing Line..." + k);
             List<Shape> tripShapes = readShapes(t.getShapeId());
             t.setShapes(tripShapes);
             DadosMapa dm = dadosMapa.get(k);
+
             t.setDadosMapa(dm != null ? dm : new DadosMapa());
-            t.setRoute(routes.get(k));
+            t.setRoute(routes.get(k) != null ? routes.get(k) : new Route());
             t.setBilhetagem(readBilhetagem(k.substring(0, 7)));
-            System.out.println("Line ready " + k);
+            
         });
+        System.out.println("Total Lines " + trips.size());
 
         writeGeoJson(trips);
 
     }
 
     public static Bilhetagem readBilhetagem(String codLinha){
-
         if(BILH_LINES == null){
             BILH_LINES = readFileContent(BILH_FILE_PATH);
         }
         List<Bilhetagem> allDays = new ArrayList<Bilhetagem>();
         BILH_LINES.stream()
-        .filter(l -> Bilhetagem.extractCodLinha(l.split(",")[4]).equals(codLinha))
+        .filter(l -> Bilhetagem.extractCodLinha(l.split(",")[4]).equals(codLinha.trim()))
         .forEach(l ->{
             allDays.add(new Bilhetagem(l));
         });
+
+        if(allDays.isEmpty()) return new Bilhetagem();
 
         return Bilhetagem.generateMonthReport(allDays);
 
@@ -60,19 +88,22 @@ public class Converter {
             writer.write("{\n");
             writer.write("\"type\": \"FeatureCollection\",\n");
             writer.write("\"features\": [\n");
+            boolean first = true;
 
             for(Trip t : trips.values()){
+
+                if(!first) writer.write(",\n");
+                else first = false;
 
                 writer.write("\t{\n");
                 writer.write("\t\t\"type\": \"Feature\",\n");
                 writer.write("\t\t\"geometry\": {\n");
                 writer.write("\t\t\t\"type\": \"LineString\",\n");
                 writer.write("\t\t\t\"coordinates\":[\n");
-                boolean first = true;
-                for(Shape s : t.getShapes()){
-                    if(!first) writer.write(",\n");
-                    else first = false;
+                for(int i=0;i < t.getShapes().size();i++){
+                    Shape s = t.getShapes().get(i);
                     
+                    if(i>0) writer.write(",\n");
                     writer.write("\t\t\t\t[");
                     writer.write(s.getLng());
                     writer.write(",");
@@ -83,14 +114,14 @@ public class Converter {
                 writer.write("\t\t},\n");//geometry
 
                 writer.write("\t\t\"properties\":{\n");
-                writer.write("\t\t\t\"LINHA_CODI\" : \"" + t.getCodSent() + "\",\n");
-                writer.write("\t\t\t\"CODIGO\" : \"" + t.getCod() + "\",\n");
-                writer.write("\t\t\t\"NOME\" : \"" + t.getRoute().getName() + "\",\n");
-                writer.write("\t\t\t\"LETREIRO\" : \"" + t.getName().toUpperCase() + "\",\n");
-                writer.write("\t\t\t\"DISTANCIA\" : \"0\",\n");
-                writer.write("\t\t\t\"DATA_CRIA\" : \"" + t.getDadosMapa().getDATA_CRIA() + "\",\n");
-                writer.write("\t\t\t\"DATA_ATUALIZA\" : \"" + t.getDadosMapa().getDATA_ATUALIZA() + "\",\n");
-                writer.write("\t\t\t\"DATA_DESATIVA\" : \"" + t.getDadosMapa().getDATA_DESATIVA() + "\",\n");
+                writer.write("\t\t\t\"LINHA_SENT\" : \"" + t.getCodSent() + "\",\n");
+                writer.write("\t\t\t\"LINHA_COD\" : \"" + t.getCod() + "\",\n");
+                writer.write("\t\t\t\"LINHA_NOME\" : \"" + t.getRoute().getName() + "\",\n");
+                writer.write("\t\t\t\"LINHA_LETREIRO\" : \"" + t.getName().toUpperCase() + "\",\n");
+                writer.write("\t\t\t\"DISTANCIA\" : \"" + t.getDadosMapa().getDISTANCIA() + "\",\n");
+                writer.write("\t\t\t\"DATA_CRIACAO\" : \"" + t.getDadosMapa().getDATA_CRIACAO() + "\",\n");
+                writer.write("\t\t\t\"DATA_ALTERACAO\" : \"" + t.getDadosMapa().getDATA_ALTERACAO() + "\",\n");
+                writer.write("\t\t\t\"DATA_DESATIVAC\" : \"" + t.getDadosMapa().getDATA_DESATIVAC() + "\",\n");
                 writer.write("\t\t\t\"PRI_VIAG\" : \"" + t.getDadosMapa().getPRI_VIAG() + "\",\n");
                 writer.write("\t\t\t\"ULT_VIAG\" : \"" + t.getDadosMapa().getULT_VIAG() + "\",\n");
                 writer.write("\t\t\t\"COD_AREA\" : \"" + t.getDadosMapa().getCOD_AREA() + "\",\n");
@@ -122,12 +153,14 @@ public class Converter {
                 writer.write("\t\t\t\"PAS_MED_QUI\" : \"" + t.getBilhetagem().getMedPassQui() + "\",\n");
                 writer.write("\t\t\t\"PAS_MED_SEX\" : \"" + t.getBilhetagem().getMedPassSex() + "\",\n");
                 writer.write("\t\t\t\"PAS_MED_SAB\" : \"" + t.getBilhetagem().getMedPassSab() + "\",\n");
-                writer.write("\t\t\t\"MES_REF\" : \"" + t.getBilhetagem().getData() + "\",\n");
-                writer.write("\t\t\t\"ATIVA\" : \"1\"\n");
+                writer.write("\t\t\t\"DATA_REF\" : \"" + t.getBilhetagem().getData() + "\",\n");
+                String dataDesativac = t.getDadosMapa().getDATA_DESATIVAC();
+                writer.write("\t\t\t\"ATIVA\" : \"" + (dataDesativac == null || dataDesativac.trim() == "" ? 1 : 0) + "\",\n");
+                writer.write("\t\t\t\"OBS\" : \"\"\n");
                 
                 writer.write("\t\t}\n");//properties
 
-                writer.write("\t},\n");
+                writer.write("\t}");
 
             }
 
@@ -149,7 +182,7 @@ public class Converter {
     }
 
     public static Map<String, DadosMapa> readDadosMapa(){
-        List<String> lines = readFileContent("files/cem/LB15_LI_MSP_CEM_V3.json");
+        List<String> lines = readFileContent("files/input/LB15_LI_MSP_CEM_v4.json", MAX_READS);
         Map<String, DadosMapa> dados = new HashMap<String, DadosMapa>();
         for(int i=0; i< lines.size();i++){
             List<String> props = new ArrayList<String>();
@@ -163,7 +196,7 @@ public class Converter {
 
                 }
                 DadosMapa d = new DadosMapa(props);
-                dados.put(d.getLINHA_CODI(), d);
+                dados.put(d.getLINHA_SENT().trim(), d);
 
             }
         }
@@ -197,12 +230,12 @@ public class Converter {
 
     }
 
-    public static Map<String, Trip> readAllTrips(int limit){
-        List<String> trips = readFileContent("files/sptrans-gtfs/trips.txt", limit);
+    public static Map<String, Trip> readAllTrips(){
+        List<String> trips = readFileContent("files/sptrans-gtfs/trips.txt");
         Map<String, Trip> result = new HashMap<String, Trip>();
         trips.stream().forEach(t -> {
             Trip trip = new Trip(t);
-            result.put(trip.getCodSent(), trip);
+            result.put(trip.getCodSent().trim(), trip);
         });
 
         return result;

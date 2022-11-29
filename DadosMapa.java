@@ -3,10 +3,15 @@ import java.util.List;
 
 public class DadosMapa {
     
-    private String CODIGO;
-    private String SENTIDO;
-    private String LINHA_CODI;
-    private String DATA_CRIA;
+    private String LINHA_SENT;
+    private String LINHA_COD;
+    private String LINHA_NOME;
+    private String LINHA_LETREIRO;
+    private String DATA_CRIACAO;
+    private String DATA_DESATIVAC;
+    private String DATA_ALTERACAO;
+    private String DATA_REF;
+    private String DISTANCIA;
     private String PRI_VIAG;
     private String ULT_VIAG;
     private String COD_AREA;
@@ -16,21 +21,28 @@ public class DadosMapa {
     private String CONSORCIO;
     private String SUBSISTEMA;
     private String FROTA;
+    private String DIAS;
     private String CLASSE;
-    private String PASS_DIN;
-    private String PASS_BCOM;
-    private String PASS_BMENS;
-    private String PASS_BEST;
-    private String PASS_BVT;
-    private String PASS_BVTME;
-    private String PASS_INMC;
-    private String PASS_INMCM;
-    private String PASS_PAGA;
-    private String PASS_INBUS;
-    private String PASS_GRAT;
-    private String TOTAL_PASS;
-    private String DATA_ATUALIZA;
-    private String DATA_DESATIVA;    
+    private String PGT_DIN;
+    private String PGT_BU_COM;
+    private String PGT_BU_MEN;
+    private String PGT_EST;
+    private String PGT_EST_MEN;
+    private String PGT_VT_MEN;
+    private String PGT_TOTAL;
+    private String INT_BU_BUS;
+    private String GRT;
+    private String GRT_EST;
+    private String PAS_TOTAL;
+    private String PAS_MED_DOM;
+    private String PAS_MED_SEG;
+    private String PAS_MED_TER;    
+    private String PAS_MED_QUA;
+    private String PAS_MED_QUI;
+    private String PAS_MED_SEX;
+    private String PAS_MED_SAB;
+    private String ATIVA;
+    private String OBS;  
 
     public DadosMapa(){}
 
@@ -52,21 +64,47 @@ public class DadosMapa {
 
                 }
             }catch(Exception e){
-                System.err.println("Ops " + e.getMessage());
+                System.err.println("ERRO " + e.getMessage());
             }
             
         }
-        Integer sentido = Integer.parseInt(this.SENTIDO.trim()) - 1;
-        this.LINHA_CODI = this.CODIGO.trim().concat("-" + sentido);
 
     }
 
-    public String getLINHA_CODI() {
-        return LINHA_CODI;
+    public String getLINHA_SENT() {
+        return LINHA_SENT;
     }
 
-    public String getDATA_CRIA() {
-        return DATA_CRIA;
+    public String getLINHA_COD() {
+        return LINHA_COD;
+    }
+
+    public String getLINHA_NOME() {
+        return LINHA_NOME;
+    }
+
+    public String getLINHA_LETREIRO() {
+        return LINHA_LETREIRO;
+    }
+
+    public String getDATA_CRIACAO() {
+        return DATA_CRIACAO;
+    }
+
+    public String getDATA_DESATIVAC() {
+        return DATA_DESATIVAC;
+    }
+
+    public String getDATA_ALTERACAO() {
+        return DATA_ALTERACAO;
+    }
+
+    public String getDATA_REF() {
+        return DATA_REF;
+    }
+
+    public String getDISTANCIA() {
+        return DISTANCIA;
     }
 
     public String getPRI_VIAG() {
@@ -105,171 +143,102 @@ public class DadosMapa {
         return FROTA;
     }
 
+    public String getDIAS() {
+        return DIAS;
+    }
+
     public String getCLASSE() {
         return CLASSE;
     }
 
-    public String getPASS_DIN() {
-        return PASS_DIN;
+    public String getPGT_DIN() {
+        return PGT_DIN;
     }
 
-    public String getPASS_BCOM() {
-        return PASS_BCOM;
+    public String getPGT_BU_COM() {
+        return PGT_BU_COM;
     }
 
-    public String getPASS_BMENS() {
-        return PASS_BMENS;
+    public String getPGT_BU_MEN() {
+        return PGT_BU_MEN;
     }
 
-    public String getPASS_BEST() {
-        return PASS_BEST;
+    public String getPGT_EST() {
+        return PGT_EST;
     }
 
-    public String getPASS_BVT() {
-        return PASS_BVT;
+    public String getPGT_EST_MEN() {
+        return PGT_EST_MEN;
     }
 
-    public String getPASS_BVTME() {
-        return PASS_BVTME;
+    public String getPGT_VT_MEN() {
+        return PGT_VT_MEN;
     }
 
-    public String getPASS_INMC() {
-        return PASS_INMC;
+    public String getPGT_TOTAL() {
+        return PGT_TOTAL;
     }
 
-    public String getPASS_INMCM() {
-        return PASS_INMCM;
+    public String getINT_BU_BUS() {
+        return INT_BU_BUS;
     }
 
-    public String getPASS_PAGA() {
-        return PASS_PAGA;
+    public String getGRT() {
+        return GRT;
     }
 
-    public String getPASS_INBUS() {
-        return PASS_INBUS;
+    public String getGRT_EST() {
+        return GRT_EST;
     }
 
-    public String getPASS_GRAT() {
-        return PASS_GRAT;
+    public String getPAS_TOTAL() {
+        return PAS_TOTAL;
     }
 
-    public String getTOTAL_PASS() {
-        return TOTAL_PASS;
+    public String getPAS_MED_DOM() {
+        return PAS_MED_DOM;
     }
 
-    public String getDATA_ATUALIZA() {
-        return DATA_ATUALIZA;
+    public String getPAS_MED_SEG() {
+        return PAS_MED_SEG;
     }
 
-    public String getDATA_DESATIVA() {
-        return DATA_DESATIVA;
+    public String getPAS_MED_TER() {
+        return PAS_MED_TER;
     }
 
-    public void setLINHA_CODI(String lINHA_CODI) {
-        LINHA_CODI = lINHA_CODI;
+    public String getPAS_MED_QUA() {
+        return PAS_MED_QUA;
     }
 
-    public void setDATA_CRIA(String dATA_CRIA) {
-        DATA_CRIA = dATA_CRIA;
+    public String getPAS_MED_QUI() {
+        return PAS_MED_QUI;
     }
 
-    public void setPRI_VIAG(String pRI_VIAG) {
-        PRI_VIAG = pRI_VIAG;
+    public String getPAS_MED_SEX() {
+        return PAS_MED_SEX;
     }
 
-    public void setULT_VIAG(String uLT_VIAG) {
-        ULT_VIAG = uLT_VIAG;
+    public String getPAS_MED_SAB() {
+        return PAS_MED_SAB;
     }
 
-    public void setCOD_AREA(String cOD_AREA) {
-        COD_AREA = cOD_AREA;
+    public String getATIVA() {
+        return ATIVA;
     }
 
-    public void setTP_LINHA(String tP_LINHA) {
-        TP_LINHA = tP_LINHA;
+    public String getOBS() {
+        return OBS;
     }
 
-    public void setEMPRESA1(String eMPRESA1) {
-        EMPRESA1 = eMPRESA1;
+    public void setDATA_DESATIVAC(String dATA_DESATIVAC) {
+        DATA_DESATIVAC = dATA_DESATIVAC;
     }
 
-    public void setEMPRESA2(String eMPRESA2) {
-        EMPRESA2 = eMPRESA2;
+    public void setATIVA(String aTIVA) {
+        ATIVA = aTIVA;
     }
-
-    public void setCONSORCIO(String cONSORCIO) {
-        CONSORCIO = cONSORCIO;
-    }
-
-    public void setSUBSISTEMA(String sUBSISTEMA) {
-        SUBSISTEMA = sUBSISTEMA;
-    }
-
-    public void setFROTA(String fROTA) {
-        FROTA = fROTA;
-    }
-
-    public void setCLASSE(String cLASSE) {
-        CLASSE = cLASSE;
-    }
-
-    public void setPASS_DIN(String pASS_DIN) {
-        PASS_DIN = pASS_DIN;
-    }
-
-    public void setPASS_BCOM(String pASS_BCOM) {
-        PASS_BCOM = pASS_BCOM;
-    }
-
-    public void setPASS_BMENS(String pASS_BMENS) {
-        PASS_BMENS = pASS_BMENS;
-    }
-
-    public void setPASS_BEST(String pASS_BEST) {
-        PASS_BEST = pASS_BEST;
-    }
-
-    public void setPASS_BVT(String pASS_BVT) {
-        PASS_BVT = pASS_BVT;
-    }
-
-    public void setPASS_BVTME(String pASS_BVTME) {
-        PASS_BVTME = pASS_BVTME;
-    }
-
-    public void setPASS_INMC(String pASS_INMC) {
-        PASS_INMC = pASS_INMC;
-    }
-
-    public void setPASS_INMCM(String pASS_INMCM) {
-        PASS_INMCM = pASS_INMCM;
-    }
-
-    public void setPASS_PAGA(String pASS_PAGA) {
-        PASS_PAGA = pASS_PAGA;
-    }
-
-    public void setPASS_INBUS(String pASS_INBUS) {
-        PASS_INBUS = pASS_INBUS;
-    }
-
-    public void setPASS_GRAT(String pASS_GRAT) {
-        PASS_GRAT = pASS_GRAT;
-    }
-
-    public void setTOTAL_PASS(String tOTAL_PASS) {
-        TOTAL_PASS = tOTAL_PASS;
-    }
-
-    public void setDATA_ATUALIZA(String dATA_ATUALIZA) {
-        DATA_ATUALIZA = dATA_ATUALIZA;
-    }
-
-    public void setDATA_DESATIVA(String dATA_DESATIVA) {
-        DATA_DESATIVA = dATA_DESATIVA;
-    }
-
-    
+ 
 
 }
 

@@ -4,6 +4,7 @@ public class Route {
     private String name;
     private String routeColor;
 
+    public Route(){}
 
     public Route(String line){
 
@@ -12,10 +13,7 @@ public class Route {
         this.name = spl[3];
         this.routeColor = spl[5];
 
-
     }
-
-    
 
     public String getName() {
         return name;
