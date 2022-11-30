@@ -58,7 +58,7 @@ public class Converter {
             t.setBilhetagem(readBilhetagem(k.substring(0, 7)));
             
         });
-        System.out.println("Total Lines " + trips.size());
+        System.out.println("Total Lines ready " + trips.size());
 
         writeGeoJson(trips);
 
@@ -156,7 +156,7 @@ public class Converter {
                 writer.write("\t\t\t\"DATA_REF\" : \"" + t.getBilhetagem().getData() + "\",\n");
                 String dataDesativac = t.getDadosMapa().getDATA_DESATIVAC();
                 writer.write("\t\t\t\"ATIVA\" : \"" + (dataDesativac == null || dataDesativac.trim() == "" ? 1 : 0) + "\",\n");
-                writer.write("\t\t\t\"OBS\" : \"\"\n");
+                writer.write("\t\t\t\"OBS\" : \"" + t.getDadosMapa().getOBS() + "\"\n");
                 
                 writer.write("\t\t}\n");//properties
 
