@@ -15,6 +15,6 @@ Como fonte das informações, foram utilizados:
 - Baixar a planilha com o total mensal de passageiros transportados no site de acesso à informação da SPTrans e converter a parte Geral_Consolidado para CSV separado por vírgulas e salvar em files/bilhetagem
 - Baixar os arquivos de GTFS do site de desenvolvedor da SPTrans e salvar em files/sptrans-gtfs
 - Instalar o Java 11 ou superior
-- Executar comando javac SptConverter.class
+- Executar comando javac SptConverter.java
 - Executar comando java SptConverter
 - Após o processamento o novo arquivo geojson estará disponível em files/output
