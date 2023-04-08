@@ -58,13 +58,13 @@ public class DadosMapa {
                         String[] spl = l2.split(":");
                         String val = spl[1];
                         if(spl.length > 2) val = val + ":" + spl[2];
-                        f.set(this, val);
+                        f.set(this, val != null && val.trim() != "null" ? val.trim() : "");
                         break;
                     }
 
                 }
             }catch(Exception e){
-                System.err.println("ERRO " + e.getMessage());
+                System.err.println("ERRO DADOSMAPA " + e.getMessage());
             }
             
         }

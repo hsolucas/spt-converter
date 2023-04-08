@@ -20,13 +20,7 @@ public class Bilhetagem {
     private int grat;
     private int gratEstud;
     private int totalPass;
-    private int medPassSeg;
-    private int medPassTer;
-    private int medPassQua;
-    private int medPassQui;
-    private int medPassSex;
-    private int medPassSab;
-    private int medPassDom;
+    private int[] medPassDay;
     private String empresa;
 
     public Bilhetagem(){}
@@ -65,10 +59,13 @@ public class Bilhetagem {
     public static Bilhetagem generateMonthReport(List<Bilhetagem> allDays){
 
         int total = 0;
+        // 10 modalidades de pagto
         int[] totalByPag = new int[10];
+        // 7 dias 5 semanas max (calendario)
         Integer[][] mdByDay = new Integer[7][5];
         Calendar cal = Calendar.getInstance();
         Date data = new Date();
+        String empresa = null;
 
         for(Bilhetagem b : allDays){
 
@@ -76,6 +73,7 @@ public class Bilhetagem {
                 
                 data = new SimpleDateFormat("dd/MM/yyyy").parse(b.getData());
                 cal.setTime(data);
+                empresa = b.getEmpresa();
                 if(b.getTotalPass() > 0){
                     mdByDay[cal.get(Calendar.DAY_OF_WEEK)-1][cal.get(Calendar.DAY_OF_MONTH)/7] = b.getTotalPass();
                     total += b.getTotalPass();
@@ -93,21 +91,18 @@ public class Bilhetagem {
 
             } catch (Exception e) {
                 System.out.println(String.format("Erro bilhetagem mensal %s %s ", b.getLinha(), b.getData()));
-                System.out.println(e.getMessage());
+                e.printStackTrace();
             }
 
         }
 
         Bilhetagem result = new Bilhetagem();
         result.setData(data.toString());
+        result.setEmpresa(empresa);
         result.setTotalPass(total);
-        result.setMedPassDom(calcMedPassByDay(mdByDay[0]));
-        result.setMedPassSeg(calcMedPassByDay(mdByDay[1]));
-        result.setMedPassTer(calcMedPassByDay(mdByDay[2]));
-        result.setMedPassQua(calcMedPassByDay(mdByDay[3]));
-        result.setMedPassQui(calcMedPassByDay(mdByDay[4]));
-        result.setMedPassSex(calcMedPassByDay(mdByDay[5]));
-        result.setMedPassSab(calcMedPassByDay(mdByDay[6]));
+        for(int i=0;i<mdByDay.length;i++){
+            result.setMedPassDay(i, calcMedPassByDay(mdByDay[i]));
+        }
         result.setPagCash(totalByPag[0]);
         result.setPagBuComumVT(totalByPag[1]);
         result.setPagBuComumMens(totalByPag[2]);
@@ -121,6 +116,10 @@ public class Bilhetagem {
 
         return result;
 
+    }
+
+    private void setEmpresa(String empresa) {
+        this.empresa = empresa;
     }
 
     public static int calcMedPassByDay(Integer[] dayVals){
@@ -139,6 +138,7 @@ public class Bilhetagem {
             }
             return sum/len;
         }catch(Exception e){
+            System.out.println("Bilhetagem.calcMedPassByDay >>> " + e.getMessage());
             return 0;
         }        
 
@@ -248,71 +248,25 @@ public class Bilhetagem {
         this.totalPass = totalPass;
     }
 
-    public int getMedPassSeg() {
-        return medPassSeg;
-    }
-
-    public void setMedPassSeg(int medPassSeg) {
-        this.medPassSeg = medPassSeg;
-    }
-
-    public int getMedPassTer() {
-        return medPassTer;
-    }
-
-    public void setMedPassTer(int medPassTer) {
-        this.medPassTer = medPassTer;
-    }
-
-    public int getMedPassQua() {
-        return medPassQua;
-    }
-
-    public void setMedPassQua(int medPassQua) {
-        this.medPassQua = medPassQua;
-    }
-
-    public int getMedPassQui() {
-        return medPassQui;
-    }
-
-    public void setMedPassQui(int medPassQui) {
-        this.medPassQui = medPassQui;
-    }
-
-    public int getMedPassSex() {
-        return medPassSex;
-    }
-
-    public void setMedPassSex(int medPassSex) {
-        this.medPassSex = medPassSex;
-    }
-
-    public int getMedPassSab() {
-        return medPassSab;
-    }
-
-    public void setMedPassSab(int medPassSab) {
-        this.medPassSab = medPassSab;
-    }
-
-    public int getMedPassDom() {
-        return medPassDom;
-    }
-
-    public void setMedPassDom(int medPassDom) {
-        this.medPassDom = medPassDom;
-    }
-
     public String getEmpresa(){
         return empresa;
     }
 
-    
+    public int getMedPassDay(int dayIndex){
+        try{
+            return this.medPassDay[dayIndex];
+        }catch(Exception e){
+            System.out.println("MedPassByday unavailable " + e.getMessage());
+            return 0;
+        }
+    }
 
-
-
-    
+    public void setMedPassDay(int dayIndex, int medPass){
+        if(this.medPassDay == null){
+            this.medPassDay = new int[7];
+        }
+        this.medPassDay[dayIndex] = medPass;
+    }
 
 
 }
