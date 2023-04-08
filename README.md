@@ -8,3 +8,13 @@ Como fonte das informações, foram utilizados:
 - banco de dados de linhas de ônibus gerado pelo Centro de Estudos da Metrópole da USP (https://centrodametropole.fflch.usp.br/pt-br/node/8364) - Este com os últimos dados de 2017
 
 É gerado um arquivo geojson que, entre outras alternativas, pode ser visualizado através do aplicativo QGIS, online pelo site https://geojson.io ou https://mapshaper.org ou convertido em um banco de dados PostGIS.
+
+## uso
+
+- Descompactar o arquivo base de dados do CEM em files/input
+- Baixar a planilha com o total mensal de passageiros transportados no site de acesso à informação da SPTrans e converter a parte Geral_Consolidado para CSV separado por vírgulas e salvar em files/bilhetagem
+- Baixar os arquivos de GTFS do site de desenvolvedor da SPTrans e salvar em files/sptrans-gtfs
+- Instalar o Java 11 ou superior
+- Executar comando javac SptConverter.class
+- Executar comando java SptConverter
+- Após o processamento o novo arquivo geojson estará disponível em files/output
