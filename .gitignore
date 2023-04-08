@@ -1,2 +1,3 @@
-/files/sptrans-gtfs
-/files/output
+/files/sptrans-gtfs/*
+/files/output/*
+*.class

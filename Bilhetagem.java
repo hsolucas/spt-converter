@@ -27,6 +27,7 @@ public class Bilhetagem {
     private int medPassSex;
     private int medPassSab;
     private int medPassDom;
+    private String empresa;
 
     public Bilhetagem(){}
 
@@ -34,6 +35,7 @@ public class Bilhetagem {
 
         String[] spl = line.split(",");
         this.data = spl[0];
+        this.empresa = spl[3];
         this.linha = extractCodLinha(spl[4]);
         this.pagCash = Integer.parseInt(spl[5]);
         this.pagBuComumVT = Integer.parseInt(spl[6]);
@@ -75,7 +77,7 @@ public class Bilhetagem {
                 data = new SimpleDateFormat("dd/MM/yyyy").parse(b.getData());
                 cal.setTime(data);
                 if(b.getTotalPass() > 0){
-                    mdByDay[cal.get(Calendar.DAY_OF_WEEK)-1][cal.get(Calendar.WEEK_OF_MONTH)-1] = b.getTotalPass();
+                    mdByDay[cal.get(Calendar.DAY_OF_WEEK)-1][cal.get(Calendar.DAY_OF_MONTH)/7] = b.getTotalPass();
                     total += b.getTotalPass();
                     totalByPag[0] += b.getPagCash();
                     totalByPag[1] += b.getPagBuComumVT();
@@ -90,8 +92,8 @@ public class Bilhetagem {
                 }
 
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                System.out.println(String.format("Erro bilhetagem mensal %s %s ", b.getLinha(), b.getData()));
+                System.out.println(e.getMessage());
             }
 
         }
@@ -300,6 +302,10 @@ public class Bilhetagem {
 
     public void setMedPassDom(int medPassDom) {
         this.medPassDom = medPassDom;
+    }
+
+    public String getEmpresa(){
+        return empresa;
     }
 
     
