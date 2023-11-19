@@ -1,5 +1,6 @@
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
 
 public class DadosMapa {
     
@@ -44,7 +45,9 @@ public class DadosMapa {
     private String ATIVA;
     private String OBS;  
 
-    public DadosMapa(){}
+    public DadosMapa(){
+        this.DATA_CRIACAO = "NOVA";
+    }
 
     public DadosMapa(List<String> lines){
 
@@ -88,67 +91,67 @@ public class DadosMapa {
     }
 
     public String getDATA_CRIACAO() {
-        return DATA_CRIACAO;
+        return Objects.toString(DATA_CRIACAO, "N/D");
     }
 
     public String getDATA_DESATIVAC() {
-        return DATA_DESATIVAC;
+        return Objects.toString(DATA_DESATIVAC, "");
     }
 
     public String getDATA_ALTERACAO() {
-        return DATA_ALTERACAO;
+        return Objects.toString(DATA_ALTERACAO, "");
     }
 
     public String getDATA_REF() {
-        return DATA_REF;
+        return Objects.toString(DATA_REF, "N/D");
     }
 
     public String getDISTANCIA() {
-        return DISTANCIA;
+        return Objects.toString(DISTANCIA, "");
     }
 
     public String getPRI_VIAG() {
-        return PRI_VIAG;
+        return Objects.toString(PRI_VIAG, "N/D");
     }
 
     public String getULT_VIAG() {
-        return ULT_VIAG;
+        return Objects.toString(ULT_VIAG, "N/D");
     }
 
     public String getCOD_AREA() {
-        return COD_AREA;
+        return Objects.toString(COD_AREA, "N/D");
     }
 
     public String getTP_LINHA() {
-        return TP_LINHA;
+        return Objects.toString(TP_LINHA, "N/D");
     }
 
     public String getEMPRESA1() {
-        return EMPRESA1;
+        return Objects.toString(EMPRESA1, "N/D");
     }
 
     public String getEMPRESA2() {
-        return EMPRESA2;
+        return Objects.toString(EMPRESA2, "N/D");
     }
 
     public String getCONSORCIO() {
-        return CONSORCIO;
+        return Objects.toString(CONSORCIO, "N/D");
     }
 
     public String getSUBSISTEMA() {
-        return SUBSISTEMA;
+        return Objects.toString(SUBSISTEMA, "N/D");
     }
 
     public String getFROTA() {
-        return FROTA;
+        return Objects.toString(FROTA, "");
     }
 
     public String getDIAS() {
-        return DIAS;
+        return Objects.toString(DIAS, "N/D");
     }
 
     public String getCLASSE() {
-        return CLASSE;
+        return Objects.toString(CLASSE, "N/D");
     }
 
     public String getPGT_DIN() {
@@ -228,15 +231,19 @@ public class DadosMapa {
     }
 
     public String getOBS() {
-        return OBS;
+        return Objects.toString(OBS, "");
     }
 
     public void setDATA_DESATIVAC(String dATA_DESATIVAC) {
-        DATA_DESATIVAC = dATA_DESATIVAC;
+        this.DATA_DESATIVAC = dATA_DESATIVAC;
+    }
+
+    public void setDATA_ALTERACAO(String dATA_ALT) {
+        this.DATA_ALTERACAO = dATA_ALT;
     }
 
     public void setATIVA(String aTIVA) {
-        ATIVA = aTIVA;
+        this.ATIVA = aTIVA;
     }
  
 

@@ -22,6 +22,8 @@ public class Bilhetagem {
     private int totalPass;
     private int[] medPassDay;
     private String empresa;
+    private String area;
+    private String classe;
 
     public Bilhetagem(){}
 
@@ -29,6 +31,8 @@ public class Bilhetagem {
 
         String[] spl = line.split(",");
         this.data = spl[0];
+        this.classe = spl[1];
+        this.area = spl[2];
         this.empresa = spl[3];
         this.linha = extractCodLinha(spl[4]);
         this.pagCash = Integer.parseInt(spl[5]);
@@ -65,15 +69,16 @@ public class Bilhetagem {
         Integer[][] mdByDay = new Integer[7][5];
         Calendar cal = Calendar.getInstance();
         Date data = new Date();
-        String empresa = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Bilhetagem month = new Bilhetagem();
 
         for(Bilhetagem b : allDays){
 
             try {
                 
-                data = new SimpleDateFormat("dd/MM/yyyy").parse(b.getData());
+                data = sdf.parse(b.getData());
                 cal.setTime(data);
-                empresa = b.getEmpresa();
+                
                 if(b.getTotalPass() > 0){
                     mdByDay[cal.get(Calendar.DAY_OF_WEEK)-1][cal.get(Calendar.DAY_OF_MONTH)/7] = b.getTotalPass();
                     total += b.getTotalPass();
@@ -89,6 +94,10 @@ public class Bilhetagem {
                     totalByPag[9] += b.getGratEstud();
                 }
 
+                month.setEmpresa(b.getEmpresa());
+                month.setArea(b.getArea());
+                month.setClasse(b.getClasse());
+
             } catch (Exception e) {
                 System.out.println(String.format("Erro bilhetagem mensal %s %s ", b.getLinha(), b.getData()));
                 e.printStackTrace();
@@ -96,25 +105,25 @@ public class Bilhetagem {
 
         }
 
-        Bilhetagem result = new Bilhetagem();
-        result.setData(data.toString());
-        result.setEmpresa(empresa);
-        result.setTotalPass(total);
-        for(int i=0;i<mdByDay.length;i++){
-            result.setMedPassDay(i, calcMedPassByDay(mdByDay[i]));
-        }
-        result.setPagCash(totalByPag[0]);
-        result.setPagBuComumVT(totalByPag[1]);
-        result.setPagBuComumMens(totalByPag[2]);
-        result.setPagEstud(totalByPag[3]);
-        result.setPagEstudMens(totalByPag[4]);
-        result.setPagVTMensal(totalByPag[5]);
-        result.setPagTotal(totalByPag[6]);
-        result.setIntegrBusBus(totalByPag[7]);
-        result.setGrat(totalByPag[8]);
-        result.setGratEstud(totalByPag[9]);
+        //Converte a bilhetagem diaria em uma unica do mes
 
-        return result;
+        month.setData(data.toString());
+        month.setTotalPass(total);
+        for(int i=0;i<mdByDay.length;i++){
+            month.setMedPassDay(i, calcMedPassByDay(mdByDay[i]));
+        }
+        month.setPagCash(totalByPag[0]);
+        month.setPagBuComumVT(totalByPag[1]);
+        month.setPagBuComumMens(totalByPag[2]);
+        month.setPagEstud(totalByPag[3]);
+        month.setPagEstudMens(totalByPag[4]);
+        month.setPagVTMensal(totalByPag[5]);
+        month.setPagTotal(totalByPag[6]);
+        month.setIntegrBusBus(totalByPag[7]);
+        month.setGrat(totalByPag[8]);
+        month.setGratEstud(totalByPag[9]);
+
+        return month;
 
     }
 
@@ -136,11 +145,11 @@ public class Bilhetagem {
                     len++;
                 }
             }
-            return sum/len;
+            if (len > 0) return sum/len;
         }catch(Exception e){
             System.out.println("Bilhetagem.calcMedPassByDay >>> " + e.getMessage());
-            return 0;
-        }        
+        }
+        return 0;   
 
     }
 
@@ -196,6 +205,14 @@ public class Bilhetagem {
         return totalPass;
     }
 
+    public String getArea(){
+        return area;
+    }
+
+    public String getClasse(){
+        return classe;
+    }
+
     public void setData(String data) {
         this.data = data;
     }
@@ -246,6 +263,14 @@ public class Bilhetagem {
 
     public void setTotalPass(int totalPass) {
         this.totalPass = totalPass;
+    }
+
+    public void setArea(String area){
+        this.area = area;
+    }
+
+    public void setClasse(String classe){
+        this.classe = classe;
     }
 
     public String getEmpresa(){

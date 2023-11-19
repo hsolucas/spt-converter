@@ -11,7 +11,6 @@ public class SptConverter {
     static Calendar cal = Calendar.getInstance();
     static List<String> SHAPE_LINES;
     static List<String> BILH_LINES;
-    static String BILH_FILE_PATH = "files/bilhetagem/bilhetagem.csv";
     static int MAX_READS = Integer.MAX_VALUE; //Limitar regs para testes
 
     public static void main(String...args){
@@ -21,15 +20,13 @@ public class SptConverter {
         Map<String, Route> routes = readRoutes();
 
         //Check recent inactivated lines
-        dadosMapa.keySet().stream()
-        .filter(k -> k != null && trips.get(k) == null)
-        .forEach(k -> {
-            System.out.println("Trip NOT found in SPTRANS file. Line will be deactivated " + k);
-            DadosMapa dm = dadosMapa.get(k);
+        dadosMapa.values().stream()
+        .filter(dm -> dm != null && trips.get(dm.getLINHA_COD()+"-0") == null && routes.get(dm.getLINHA_COD()) == null)
+        .forEach(dm -> {
+            System.out.println("Trip NOT found in SPTRANS file. Line will be deactivated " + dm.getLINHA_SENT());
             Trip t = deactivateLinha(dm);
-            trips.put(k, t);
-        });
-
+            trips.put(dm.getLINHA_SENT(), t);
+        });        
         
         trips.keySet().stream()
         .forEach(k -> {
@@ -44,7 +41,7 @@ public class SptConverter {
             }
 
             t.setDadosMapa(dm);
-            t.setRoute(routes.get(k) != null ? routes.get(k) : new Route());
+            t.setRoute(routes.get(t.getCod()) != null ? routes.get(t.getCod()) : new Route());
             t.setBilhetagem(readBilhetagem(k.substring(0, 7)));
             
         });
@@ -56,7 +53,7 @@ public class SptConverter {
 
     public static Bilhetagem readBilhetagem(String codLinha){
         if(BILH_LINES == null){
-            BILH_LINES = readFileContent(BILH_FILE_PATH);
+            BILH_LINES = readFileContent(FileType.SPTRANS_BILHETAGEM);
         }
         List<Bilhetagem> allDays = new ArrayList<Bilhetagem>();
         try{
@@ -78,8 +75,7 @@ public class SptConverter {
 
     private static void writeGeoJson(Map<String,Trip> trips){
         cal.setTime(new Date());
-        final String OUTPUT_FILE_PATH = "files/output/geofile_"+ cal.get(Calendar.MONTH) + "_" + cal.get(Calendar.YEAR) +".json";
-        try(FileWriter writer = new FileWriter(OUTPUT_FILE_PATH, false)){
+        try(FileWriter writer = new FileWriter(FileType.RESULT.getPath(), false)){
 
             writer.write("{\n");
             writer.write("\"type\": \"FeatureCollection\",\n");
@@ -110,8 +106,6 @@ public class SptConverter {
                 writer.write("\t\t\t\n]\n");//coordinates
                 writer.write("\t\t},\n");//geometry
 
-                String dataDesativac = t.getDadosMapa().getDATA_DESATIVAC();
-
                 writer.write("\t\t\"properties\":{\n");
                 writer.write("\t\t\t\"LINHA_SENT\" : \"" + t.getCodSent() + "\",\n");
                 writer.write("\t\t\t\"LINHA_COD\" : \"" + t.getCod() + "\",\n");
@@ -120,10 +114,11 @@ public class SptConverter {
                 writer.write("\t\t\t\"DISTANCIA\" : \"" + t.getDadosMapa().getDISTANCIA() + "\",\n");
                 writer.write("\t\t\t\"DATA_CRIACAO\" : \"" + t.getDadosMapa().getDATA_CRIACAO() + "\",\n");
                 writer.write("\t\t\t\"DATA_ALTERACAO\" : \"" + t.getDadosMapa().getDATA_ALTERACAO() + "\",\n");
-                writer.write("\t\t\t\"DATA_DESATIVAC\" : \"" + dataDesativac + "\",\n");
+                writer.write("\t\t\t\"DATA_DESATIVAC\" : \"" + t.getDadosMapa().getDATA_DESATIVAC() + "\",\n");
                 writer.write("\t\t\t\"PRI_VIAG\" : \"" + t.getDadosMapa().getPRI_VIAG() + "\",\n");
                 writer.write("\t\t\t\"ULT_VIAG\" : \"" + t.getDadosMapa().getULT_VIAG() + "\",\n");
                 writer.write("\t\t\t\"COD_AREA\" : \"" + t.getDadosMapa().getCOD_AREA() + "\",\n");
+                writer.write("\t\t\t\"COD_AREA_NOVO\" : \"" + t.getBilhetagem().getArea() + "\",\n");
                 writer.write("\t\t\t\"TP_LINHA\" : \"" + t.getDadosMapa().getTP_LINHA() + "\",\n");
                 writer.write("\t\t\t\"EMPRESA1\" : \"" + (t.getBilhetagem().getEmpresa() != null ? t.getBilhetagem().getEmpresa().toUpperCase() : t.getDadosMapa().getEMPRESA1()) + "\",\n");
                 writer.write("\t\t\t\"EMPRESA2\" : \"" + t.getDadosMapa().getEMPRESA2() + "\",\n");
@@ -131,7 +126,7 @@ public class SptConverter {
                 writer.write("\t\t\t\"SUBSISTEMA\" : \"" + t.getDadosMapa().getSUBSISTEMA() + "\",\n");
                 writer.write("\t\t\t\"FROTA\" : \"" + t.getDadosMapa().getFROTA() + "\",\n");
                 writer.write("\t\t\t\"DIAS\" : \"" + t.getDays() + "\",\n");
-                writer.write("\t\t\t\"CLASSE\" : \"" + t.getDadosMapa().getCLASSE() + "\",\n");
+                writer.write("\t\t\t\"CLASSE\" : \"" + t.getBilhetagem().getClasse() + "\",\n");
 
                 int tPass = t.getBilhetagem().getTotalPass();
                 writer.write("\t\t\t\"PGT_DIN\" : \"" + calcPct(t.getBilhetagem().getPagCash(), tPass) + "\",\n");
@@ -183,7 +178,7 @@ public class SptConverter {
     }
 
     public static Map<String, DadosMapa> readDadosMapa(){
-        List<String> lines = FileHandler.readContent("files/input/LB15_LI_MSP_CEM_v4.json", Integer.MAX_VALUE);
+        List<String> lines = FileHandler.readContent(FileType.INPUT_BASE.getPath(), Integer.MAX_VALUE);
         Map<String, DadosMapa> dados = new HashMap<String, DadosMapa>();
         for(int i=0; i< lines.size();i++){
             List<String> props = new ArrayList<String>();
@@ -206,7 +201,7 @@ public class SptConverter {
 
     public static List<Shape> readShapes(String shapeId){
         if(SHAPE_LINES == null){
-            SHAPE_LINES = readFileContent("files/sptrans-gtfs/shapes.txt");
+            SHAPE_LINES = readFileContent(FileType.SPTRANS_SHAPES);
         }
         List<Shape> result = new ArrayList<Shape>();
         SHAPE_LINES.stream()
@@ -218,13 +213,11 @@ public class SptConverter {
     }
 
     public static Map<String, Route> readRoutes(){
-        List<String> routes = readFileContent("files/sptrans-gtfs/routes.txt");
+        List<String> routes = readFileContent(FileType.SPTRANS_ROUTES);
         Map<String, Route> result = new HashMap<String, Route>();
         routes.stream().forEach(l -> {
             Route r = new Route(l);
-            //Separa ida e volta
-            result.put(r.getRouteId() + "-0", r);
-            result.put(r.getRouteId() + "-1", r);
+            result.put(r.getRouteId(), r);
         });
 
         return result;
@@ -232,7 +225,7 @@ public class SptConverter {
     }
 
     public static Map<String, Trip> readAllTrips(){
-        List<String> trips = FileHandler.readContent("files/sptrans-gtfs/trips.txt", MAX_READS);
+        List<String> trips = FileHandler.readContent(FileType.SPTRANS_TRIPS.getPath(), MAX_READS);
         Map<String, Trip> result = new HashMap<String, Trip>();
         trips.stream().forEach(t -> {
             Trip trip = new Trip(t);
@@ -243,8 +236,8 @@ public class SptConverter {
 
     }
 
-    public static List<String> readFileContent(String name){
-        return FileHandler.readContent(name, Integer.MAX_VALUE);
+    public static List<String> readFileContent(FileType file){
+        return FileHandler.readContent(file.getPath(), Integer.MAX_VALUE);
     }
 
     private static Trip deactivateLinha(DadosMapa dm){

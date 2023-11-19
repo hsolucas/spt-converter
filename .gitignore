@@ -1,3 +1,6 @@
-/files/sptrans-gtfs/*
+/files/input/*
 /files/output/*
 *.class
+*.csv
+*.json
+*.txt
