@@ -1,5 +1,11 @@
 # spt-converter
 
+## stack
+
+Java
+
+## info
+
 Objetivo de unificar as informações de todas as linhas de ônibus da cidade de São Paulo, possibilitando visualizar por linha o traçado do itinerário, os dados de passageiros pagantes, ano de criação e desativação da linha, entre outros.
 
 Como fonte das informações, foram utilizados:
